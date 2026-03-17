@@ -12,7 +12,7 @@ def solve(schedule):
     best_score = s_score
 
     if len(schedule.conflict_list) > 10000:
-        time_limit = 300 
+        time_limit = 295 
         start = time.time()
 
         while time.time() - start < time_limit:
@@ -40,17 +40,26 @@ def solve(schedule):
 
 
 def generate_solution(schedule: Schedule):
+    solution = {}
     
-    solution = dict()
-    time_slot_idx = 1
-    course_list = list(schedule.course_list) 
-    while course_list:
-        random_course = random.choice(course_list)
-        assignation = time_slot_idx
-        solution[random_course] = assignation
-        course_list.remove(random_course)
-        time_slot_idx += 1
+    courses = list(schedule.course_list)
+    random.shuffle(courses)
+
+    for course in courses:
+        used_slots = set()
         
+        for c1, c2 in schedule.conflict_list:
+            if c1 == course and c2 in solution:
+                used_slots.add(solution[c2])
+            elif c2 == course and c1 in solution:
+                used_slots.add(solution[c1])
+        
+        slot = 1
+        while slot in used_slots:
+            slot += 1
+        
+        solution[course] = slot
+
     return solution
 
 def evaluate(solution, schedule):
@@ -64,7 +73,7 @@ def evaluate(solution, schedule):
 
     slots = schedule.get_n_creneaux(solution)
 
-    return conflicts * 1000 + slots
+    return conflicts * 1000 + slots*20
 
 def generate_neighbors(solution, schedule):
 
