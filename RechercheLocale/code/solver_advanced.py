@@ -12,7 +12,7 @@ def solve(schedule):
     best_score = s_score
 
     if len(schedule.conflict_list) > 10000:
-        time_limit = 295 
+        time_limit = 285  # 5 minutes maximum avec buffer
         start = time.time()
 
         while time.time() - start < time_limit:
