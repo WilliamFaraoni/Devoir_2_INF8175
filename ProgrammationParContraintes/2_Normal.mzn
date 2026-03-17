@@ -1,8 +1,7 @@
 % NOM_ETUDIANT_1 (MATRICULE_1)
 % NOM_ETUDIANT_2 (MATRICULE_2)
 
-include "globals.mzn"; 
-
+include "globals.mzn";
 %-----------------------------------------------------------------------------%
 % Données
 %-----------------------------------------------------------------------------%
@@ -36,8 +35,35 @@ var int: fin_projet;
 %-----------------------------------------------------------------------------%
 % Partie étudiant
 %-----------------------------------------------------------------------------%
+int: max_demarrage_tache_meme_temps = 2; % max 2 tâches à même heure
+
+constraint fin_projet <= m;%Condition dure
+
+% Lien début et fin
+constraint 
+  forall(i in 1..n)
+  (
+    fin_tache[i] = debut_tache[i] + duree_tache[i]
+  );
+% Fin du projet = fin de la dernière tâche
+%constraint fin_projet = max([fin_tache[i] | i in 1..n]);
+constraint fin_projet = max(fin_tache);
 
 
+% Au plus 2 tâches peuvent démarrer en même temps
+constraint cumulative(debut_tache, array1d(1..n, [1|i in 1..n]), array1d(1..n, [1|i in 1..n]), max_demarrage_tache_meme_temps);
+% constraint forall(t in 1..m)
+%            (
+%                sum(i in 1..n)(bool2int(debut_tache[i] = t)) <= max_demarrage_tache_meme_temps
+%            );
+
+
+% Limite de ressources : à tout moment t, la somme des ressources des tâches en cours ≤ limite
+constraint cumulative(debut_tache, duree_tache, ressource_tache, limite);
+
+
+%solve satisfy;
+solve minimize fin_projet;
 %-----------------------------------------------------------------------------%
 
 output [

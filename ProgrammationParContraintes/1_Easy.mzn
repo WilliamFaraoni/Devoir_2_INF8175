@@ -24,9 +24,17 @@ array [1..n] of var 1..n: assignation_role;
 %-----------------------------------------------------------------------------%
 % Partie étudiant
 %-----------------------------------------------------------------------------%
+constraint all_different([assignation_role[i] | i in 1..n]);%role attribué 1 fois uniquement. Un role ne peut pas ettre attribué a plusieurs acteurs.
+
+constraint all_different([choix_costume[assignation_role[i], i] | i in 1..n]);%aucune couleur ne doit apparaître deux fois pour un acteur donné.
+
+constraint forall(i in 1..n-1)
+           (
+             abs(assignation_role[i] - assignation_role[i+1]) > 1
+           );%deux voisins dans la liste ne peuvent pas être sur des rôles consécutifs.
 
 
-
+solve satisfy;
 %-----------------------------------------------------------------------------%
 
 output	
